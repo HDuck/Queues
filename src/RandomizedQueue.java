@@ -7,8 +7,8 @@ import java.util.NoSuchElementException;
 public class RandomizedQueue<Item> implements Iterable<Item> {
     private Item[] queue;
     private int size = 0;
-    private int last = 0;
-    private int first = 0;
+    private int last = -1;
+    private int first = -1;
 
     // construct an empty randomized queue
     public RandomizedQueue() {
@@ -33,19 +33,19 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         if (size == queue.length) {
             resize(queue.length * 2);
         }
-        if (size == 0) {
+        if (isEmpty()) {
             queue[0] = item;
+            last++;
+            first++;
         }
         else {
             int nextIndex = last + 1;
             int prevIndex = first - 1;
             if (nextIndex < queue.length) {
-                queue[nextIndex] = item;
-                last++;
+                queue[++last] = item;
             }
             else if (prevIndex >= 0) {
-                queue[prevIndex] = item;
-                first--;
+                queue[--first] = item;
             }
         }
         size++;
@@ -77,6 +77,9 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         queue[nextIndex] = null;
         size--;
         last--;
+        if (isEmpty()) {
+            first--;
+        }
         if (size <= queue.length / 4) {
             resize(queue.length / 2);
         }
