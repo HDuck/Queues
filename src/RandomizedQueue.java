@@ -69,12 +69,10 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
             throw new NoSuchElementException();
         }
         int index = StdRandom.uniform(first, last + 1);
+        Item lastItem = queue[last];
         Item item = queue[index];
-        int nextIndex = index;
-        while (nextIndex < last) {
-            queue[nextIndex] = queue[++nextIndex];
-        }
-        queue[nextIndex] = null;
+        queue[index] = lastItem;
+        queue[last] = null;
         size--;
         last--;
         if (isEmpty()) {
@@ -101,15 +99,14 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     }
 
     private class RandomListIterator implements Iterator<Item> {
-        private boolean[] iteratedItems;
+        private Item[] iteratedItems;
         private int iteratedCount = 0;
 
 
         public RandomListIterator() {
-            iteratedItems = new boolean[queue.length];
-
-            for (int i = 0; i < queue.length; i++) {
-                iteratedItems[i] = false;
+            iteratedItems = (Item[]) new Object[size];
+            for (int i = 0; i < size; i++) {
+                iteratedItems[i] = queue[i + first];
             }
         }
 
@@ -121,13 +118,15 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
-            int index;
-            do {
-                index = StdRandom.uniform(first, last + 1);
-            } while (iteratedItems[index]);
-            iteratedItems[index] = true;
+            int iteratedItemsCount = iteratedItems.length - iteratedCount;
+            int index = StdRandom.uniform(iteratedItemsCount);
+            int lastIndex = iteratedItemsCount - 1;
+            Item item = iteratedItems[index];
+            Item lastItem = iteratedItems[lastIndex];
+            iteratedItems[index] = lastItem;
+            iteratedItems[lastIndex] = null;
             iteratedCount++;
-            return queue[index];
+            return item;
         }
 
         public void remove() {
